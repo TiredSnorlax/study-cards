@@ -9,6 +9,7 @@
 	import ShareMenu from '$lib/components/ShareMenu.svelte';
 	import { page } from '$app/stores';
 	import { arrayUnion, doc, updateDoc } from 'firebase/firestore';
+	import type { User } from 'firebase/auth';
 
 	const user = userStore(auth);
 
@@ -18,14 +19,14 @@
 
 	let shareMenuOpen = false;
 
-	const checkAllowed = () => {
+	const checkAllowed = (user: User | null) => {
 		if (!user || !deckData) return;
 		let sharing = $page.url.searchParams.has('sharing');
 		if ($deckData.isPublic) {
 			updateSharedWith(sharing);
-		} else if ($deckData.ownerId === $user?.uid) {
+		} else if ($deckData.ownerId === user?.uid) {
 			console.log('allowed');
-		} else if ($deckData.permissions.find((email) => email === $user?.email)) {
+		} else if ($deckData.permissions.find((email) => email === user?.email)) {
 			console.log('allowed');
 			updateSharedWith(sharing);
 		} else {
@@ -43,9 +44,7 @@
 		});
 	};
 
-	onMount(() => {
-		checkAllowed();
-	});
+	checkAllowed($user);
 </script>
 
 <div class="page">
