@@ -104,7 +104,7 @@
 
 	.side {
 		flex-shrink: 0;
-		background: lightgray;
+		background: var(--primary-color);
 
 		width: 330px;
 
@@ -209,8 +209,9 @@
 	.permList {
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		justify-content: flex-start;
 		align-items: flex-start;
+		gap: 1rem;
 	}
 
 	.permList .permItem {
@@ -223,8 +224,17 @@
 		padding: 0.5rem 1rem;
 		border: 1px solid grey;
 
-		font-size: 1.1rem;
+		max-width: 200px;
+
+		font-size: 1rem;
 		background: #e0e0e0;
+	}
+
+	.permItem p {
+		width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.permItem button span {

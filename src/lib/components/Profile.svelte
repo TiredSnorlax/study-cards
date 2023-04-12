@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { userStore } from '$lib/stores';
+	import { userStore, currentProfile } from '$lib/stores';
 	import { auth } from '$lib/db/setup';
 	import { signOut } from 'firebase/auth';
-	import { onMount } from 'svelte';
 
 	const user = userStore(auth);
 
@@ -10,31 +9,7 @@
 		signOut(auth);
 	};
 
-	// TODO: Add secondary color
-	let bgColor: string | null;
-	let newBgColor: string | null;
-
 	let menuOpen = false;
-
-	const changeBg = (color: string | null) => {
-		if (!color) return;
-		window.document.body.style.background = color;
-	};
-
-	const saveBg = () => {
-		if (!newBgColor) return;
-		localStorage.setItem('bgColor', newBgColor);
-		bgColor = newBgColor;
-	};
-
-	$: changeBg(newBgColor);
-
-	onMount(() => {
-		bgColor = localStorage.getItem('bgColor') || '#ffffff';
-		newBgColor = localStorage.getItem('bgColor') || '#ffffff';
-
-		console.log(newBgColor);
-	});
 </script>
 
 <button class="profilePic" on:click|self={() => (menuOpen = !menuOpen)}>
@@ -44,18 +19,14 @@
 			<div class="info">
 				<img src={$user?.photoURL} alt="" />
 				<div>
-					<h2>{$user?.displayName}</h2>
+					<h2>{$currentProfile?.username}</h2>
 					<p>{$user?.email}</p>
 				</div>
 			</div>
-			<div class="colorPicker">
-				<p>BG Color:</p>
-				<input type="color" bind:value={newBgColor} />
+			<div class="btnContainer">
+				<a href="../profile/{$user?.uid}" class="editBtn">Edit</a>
+				<button class="logoutBtn" on:click={clickSignOut}>Sign out</button>
 			</div>
-			{#if bgColor !== newBgColor}
-				<button on:click={saveBg} class="saveBgBtn">Save</button>
-			{/if}
-			<button class="logoutBtn" on:click={clickSignOut}>Sign out</button>
 		</div>
 	{/if}
 </button>
@@ -73,6 +44,7 @@
 		position: fixed;
 		top: 2rem;
 		right: 2rem;
+		z-index: 100;
 	}
 
 	.profilePic::after {
@@ -99,7 +71,7 @@
 		border-radius: 1rem;
 		background: white;
 
-		border: 1px solid black;
+		box-shadow: 2px 2px 10px 4px rgba(100, 100, 100, 0.3);
 
 		display: flex;
 		align-items: center;
@@ -118,13 +90,32 @@
 		height: 72px;
 	}
 
+	.btnContainer {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.editBtn {
+		padding: 0.5rem 1rem;
+		background: var(--secondary-color);
+		color: white;
+		border-radius: 0.5rem;
+
+		font-size: 1rem;
+
+		text-decoration: none;
+	}
+
 	.logoutBtn {
 		padding: 0.5rem 1rem;
 		border: 1px solid grey;
 		border-radius: 0.5rem;
-		font-size: 1rem;
 		color: grey;
 		cursor: pointer;
+
+		font-size: 1rem;
 
 		transition: 0.2s;
 	}
@@ -132,22 +123,5 @@
 	.logoutBtn:hover {
 		background: grey;
 		color: white;
-	}
-
-	.colorPicker {
-		display: flex;
-		gap: 1rem;
-		align-items: center;
-
-		font-size: 1rem;
-	}
-
-	.saveBgBtn {
-		border-radius: 3rem;
-		border: 1px solid grey;
-		padding: 0.5rem 1rem;
-		font-size: 1rem;
-		color: grey;
-		cursor: pointer;
 	}
 </style>

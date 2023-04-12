@@ -103,14 +103,17 @@
 		position: fixed;
 		right: 2rem;
 		bottom: 2rem;
-		background: #dd00dd;
+		background: transparent;
 		opacity: 0.5;
-		color: white;
+		color: var(--secondary-color);
 		font-size: 1.5rem;
 		padding: 0.5rem 1.5rem;
 		border-radius: 4rem;
+		transform: scale(0.9);
+		border: 1px solid var(--secondary-color);
 
 		cursor: pointer;
+		transition: 0.3s;
 	}
 
 	.saveBtn:hover {
@@ -118,7 +121,9 @@
 	}
 
 	.saveBtn.hasChanged {
-		background: purple;
+		transform: scale(1);
+		background: var(--secondary-color);
+		color: white;
 		opacity: 1;
 	}
 

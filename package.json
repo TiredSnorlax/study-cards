@@ -30,9 +30,11 @@
 	"type": "module",
 	"dependencies": {
 		"@types/chart.js": "^2.9.37",
+		"@types/qrcode": "^1.5.0",
 		"@types/uuid": "^9.0.1",
 		"chart.js": "^4.2.1",
 		"firebase": "^9.17.2",
+		"qrcode": "^1.5.1",
 		"uuid": "^9.0.0"
 	}
 }

@@ -31,3 +31,7 @@ TODO:
     1. Able to share decks with other users [ ]
     2. Daily study system
       - Get a streak when you play everyday
+
+
+TODO: 
+  1. Change components background to the css variables [x]

@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { userStore } from '$lib/stores';
-	import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-	import { auth } from '$lib/db/setup';
+	import { currentProfile, userStore } from '$lib/stores';
+	import { signInWithPopup, GoogleAuthProvider, type User } from 'firebase/auth';
+	import { auth, db } from '$lib/db/setup';
 	import { onDestroy } from 'svelte';
+	import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
+	import type { IProfile } from '$lib/components/types';
 
 	const provider = new GoogleAuthProvider();
 
@@ -11,9 +13,50 @@
 	let isSignedIn = false;
 
 	const signIn = () => {
-		signInWithPopup(auth, provider).catch((err) => {
-			console.log(err.message);
-		});
+		signInWithPopup(auth, provider)
+			.then((result) => {
+				console.log(result.user);
+				getOrAddProfile(result.user);
+			})
+			.catch((err) => {
+				console.log(err.message);
+			});
+	};
+
+	const getOrAddProfile = async (user: User | null) => {
+		if (!user) return;
+		const profileDb = collection(db, 'profiles');
+		const q = query(profileDb, where('userId', '==', user.uid));
+
+		const snapshot = await getDocs(q);
+
+		if (snapshot.empty) {
+			console.log('adding profile');
+			const newProfile: IProfile = {
+				recentlyAccessed: [],
+				starred: [],
+				userId: user.uid,
+				username: user.displayName || '',
+				bgColor: '#ffffff',
+				primaryColor: '#d0d0d0',
+				secondaryColor: '#4444ff',
+				darkTheme: false
+			};
+
+			currentProfile.set(newProfile);
+			await addDoc(profileDb, newProfile);
+		} else {
+			console.log('profile', snapshot.docs[0].data());
+			currentProfile.set(snapshot.docs[0].data() as IProfile);
+		}
+	};
+
+	const setColors = (profile: IProfile | null) => {
+		if (!profile || typeof window === 'undefined') return;
+		window.document.body.style.background = profile.bgColor;
+		window.document.body.style.setProperty('--primary-color', profile.primaryColor);
+		window.document.body.style.setProperty('--secondary-color', profile.secondaryColor);
+		window.document.body.style.color = profile.darkTheme ? 'white' : 'black';
 	};
 
 	const unsubscribe = currentUser.subscribe((user) => {
@@ -26,14 +69,17 @@
 		}
 	});
 
+	$: getOrAddProfile($currentUser);
+	$: setColors($currentProfile);
+
 	onDestroy(() => {
 		unsubscribe();
 	});
 </script>
 
-<slot />
-
-{#if !isSignedIn}
+{#if isSignedIn}
+	<slot />
+{:else}
 	<div class="backdrop">
 		<div class="signInMenu">
 			<h1>Sign In</h1>

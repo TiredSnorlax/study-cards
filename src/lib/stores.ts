@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import type { IUser } from "./components/types";
+import type { IProfile, IUser } from "./components/types";
 import { onAuthStateChanged, type Auth } from 'firebase/auth'
 
 export let currentUser = writable<IUser | null>(null);
@@ -18,3 +18,5 @@ export let userStore = (auth: Auth) => {
   return user
 
 }
+export let currentProfile = writable<IProfile | null>(null);
+

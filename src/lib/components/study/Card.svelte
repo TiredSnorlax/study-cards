@@ -40,6 +40,7 @@
 	};
 
 	const rotateCard = (e: MouseEvent) => {
+		console.log('mousemove');
 		const x = e.clientX;
 		const y = e.clientY;
 
@@ -207,5 +208,11 @@
 		border: 2px solid #16b7fc;
 		border-radius: 2rem;
 		padding: 0.5rem 1rem;
+	}
+
+	@media (max-width: 600px) {
+		.card {
+			transform: perspective(1000px) rotateX(0) rotateY(0) !important;
+		}
 	}
 </style>

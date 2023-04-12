@@ -7,11 +7,24 @@ export interface IUser {
   username: string;
 }
 
+export interface IProfile {
+  recentlyAccessed: string[];
+  starred: string[];
+  username: string;
+  userId: string;
+  bgColor: string;
+  primaryColor: string;
+  secondaryColor: string;
+  darkTheme: boolean;
+}
+
 export interface IDeck {
   id?: string;
   ownerId: string;
   permissions: string[];
+  sharedWith: string[];
   title: string;
+  searchIndex: string[];
   description: string;
   createdAt: DBTimestamp;
   cards: ICard[];

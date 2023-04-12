@@ -7,10 +7,14 @@
 	import { getDocs, collection, where, query } from 'firebase/firestore';
 
 	import Profile from '$lib/components/Profile.svelte';
+	import DeckSearchBar from '$lib/components/main/DeckSearchBar.svelte';
+
+	import { quotes } from '$lib/quotes';
 
 	let user = userStore(auth);
-
 	let decks: IDeck[] = [];
+
+	let searchResults: IDeck[][] | null = null;
 
 	const getDecks = async (user: User | null) => {
 		if (!user) return;
@@ -29,8 +33,8 @@
 
 <Profile />
 <div class="page">
-	<h1>*Insert motivational quote</h1>
-	<h2>Decks</h2>
+	<h1>{quotes[Math.floor(Math.random() * quotes.length)]}</h1>
+	<DeckSearchBar bind:searchResults />
 	<div class="decks">
 		<a href="/deck/new" class="newDeckBtn"><p>New Deck</p></a>
 		{#each decks as deck}
@@ -50,13 +54,10 @@
 	}
 
 	h1 {
+		margin-top: 1rem;
 		padding-top: 3rem;
 		text-align: center;
 		font-size: 2.5rem;
-	}
-
-	h2 {
-		margin-top: 2rem;
 	}
 
 	.decks {
@@ -95,7 +96,7 @@
 	}
 
 	.newDeckBtn:hover {
-		background: #dfdfdf;
+		background: var(--secondary-color);
 	}
 
 	.deck {
@@ -111,7 +112,7 @@
 
 		text-decoration: none;
 		color: initial;
-		background: white;
+		background: var(--primary-color);
 	}
 
 	.deck > div {

@@ -1,11 +1,14 @@
 <script lang="ts">
 	import type { IDeck } from '$lib/components/types';
-	import { auth } from '$lib/db/setup';
+	import { auth, db } from '$lib/db/setup';
 	import { userStore } from '$lib/stores';
 	import type { Writable } from 'svelte/store';
 	import { getContext, onMount } from 'svelte';
 	import HomeBtn from '$lib/components/HomeBtn.svelte';
 	import Profile from '$lib/components/Profile.svelte';
+	import ShareMenu from '$lib/components/ShareMenu.svelte';
+	import { page } from '$app/stores';
+	import { arrayUnion, doc, updateDoc } from 'firebase/firestore';
 
 	const user = userStore(auth);
 
@@ -13,21 +16,31 @@
 
 	let allowed = true;
 
-	$: console.log($deckData);
+	let shareMenuOpen = false;
 
 	const checkAllowed = () => {
 		if (!user || !deckData) return;
-		if ($deckData.isPublic) return;
-		console.log($deckData);
-		if (
-			$deckData.ownerId === $user?.uid ||
-			$deckData.permissions.find((email) => email === $user?.email)
-		) {
+		let sharing = $page.url.searchParams.has('sharing');
+		if ($deckData.isPublic) {
+			updateSharedWith(sharing);
+		} else if ($deckData.ownerId === $user?.uid) {
 			console.log('allowed');
+		} else if ($deckData.permissions.find((email) => email === $user?.email)) {
+			console.log('allowed');
+			updateSharedWith(sharing);
 		} else {
 			console.log('not allowed');
 			allowed = false;
 		}
+	};
+
+	const updateSharedWith = async (_sharing: boolean) => {
+		if (!$deckData.id) return;
+		console.log('update sharing');
+		const ref = doc(db, 'decks', $deckData.id);
+		await updateDoc(ref, {
+			sharedWith: arrayUnion($user?.uid)
+		});
 	};
 
 	onMount(() => {
@@ -38,20 +51,30 @@
 <div class="page">
 	<HomeBtn />
 	<Profile />
+	{#if shareMenuOpen}
+		<ShareMenu deckId={$deckData.id} bind:shareMenuOpen />
+	{/if}
 	{#if allowed}
 		<div class="menu">
 			<div class="menu__img">Img placed here</div>
-			<div class="menu__info">
+			<div class="menu__deck">
 				{#if deckData}
-					<div>
+					<div class="menu__info">
+						<button class="shareBtn" on:click={() => (shareMenuOpen = true)}
+							><span class="material-icons-outlined"> share </span></button
+						>
 						<h1>{$deckData.title}</h1>
 						<p>{$deckData.description}</p>
+						{#if $deckData.ownerId === $user?.uid}
+							<a href="./{$deckData.id}/edit/" class="edit__btn"
+								><span class="material-icons-outlined"> edit </span>Edit</a
+							>
+						{/if}
 					</div>
 					<div class="btn__container">
-						{#if $deckData.ownerId === $user?.uid}
-							<a href="./{$deckData.id}/edit/" class="edit__btn">Edit</a>
-						{/if}
-						<a href="./{$deckData.id}/study/">Study</a>
+						<a href="./{$deckData.id}/study/" class="study__btn"
+							><span class="material-icons-outlined"> play_arrow </span></a
+						>
 					</div>
 				{/if}
 			</div>
@@ -77,7 +100,7 @@
 		height: 60%;
 		max-height: 600px;
 
-		background: white;
+		background: var(--primary-color);
 
 		border-radius: 0.5rem;
 		border: 1px solid black;
@@ -92,11 +115,19 @@
 		background: blueviolet;
 	}
 
-	.menu__info {
+	.menu__deck {
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-		padding: 2rem 0;
+		gap: 1rem;
+		padding-bottom: 2rem;
+	}
+
+	.menu__info {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: space-between;
 	}
 
 	.menu__info h1 {
@@ -108,24 +139,88 @@
 		color: grey;
 	}
 
-	.menu__info a {
-		background: blue;
+	.shareBtn {
+		background: #aaaaff;
 		padding: 0.5rem 1rem;
-		border-radius: 5rem;
+		border-radius: 3rem;
+		color: white;
+
+		margin-top: 1rem;
+		margin-right: 1rem;
+		align-self: flex-end;
+
+		text-decoration: none;
+	}
+
+	.shareBtn span {
+		display: flex;
+	}
+
+	.edit__btn {
+		padding: 0.5rem;
+		border-radius: 5px;
+		font-size: 1.2rem;
+		background: green;
+
+		color: white;
+		text-decoration: none;
+		width: min-content;
+
+		margin-top: 1rem;
+
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.menu .btn__container {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: 1rem;
 		margin-inline: 1rem;
+	}
+
+	.btn__container > a {
 		color: white;
 		font-size: 1.2rem;
 
 		text-decoration: none;
 	}
 
-	.menu .btn__container {
+	.btn__container .study__btn {
+		background: var(--secondary-color);
+		border-radius: 50%;
+		padding: 1rem;
+
 		display: flex;
-		flex-direction: column;
-		gap: 1rem;
 	}
 
-	.btn__container .edit__btn {
-		background: lightgreen;
+	.btn__container .study__btn span {
+		font-size: 2.5rem;
+	}
+
+	@media (max-width: 600px) {
+		.menu {
+			grid-template-columns: 1fr;
+			grid-template-rows: 2fr 3fr;
+		}
+
+		.menu__info h1 {
+			font-size: 2rem;
+		}
+
+		.study__btn {
+			padding: 0.75rem !important;
+		}
+
+		.study__btn span {
+			font-size: 2rem !important;
+		}
+
+		.edit__btn {
+			font-size: 1rem;
+		}
 	}
 </style>

@@ -63,7 +63,7 @@
 
 		padding: 1rem;
 		border-radius: 0.5rem;
-		background: rgb(240, 240, 240);
+		background: var(--primary-color);
 
 		border: 1px solid grey;
 

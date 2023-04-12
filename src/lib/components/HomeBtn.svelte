@@ -1,5 +1,10 @@
 <script lang="ts">
-	const domain = 'http://' + window.location.host;
+	import { onMount } from 'svelte';
+
+	let domain = '';
+	onMount(() => {
+		domain = 'http://' + window.location.host;
+	});
 </script>
 
 <a href={domain}>
@@ -24,5 +29,12 @@
 
 	a span {
 		font-size: 2rem;
+	}
+
+	@media (max-width: 600px) {
+		a {
+			top: 1rem;
+			left: 1rem;
+		}
 	}
 </style>
