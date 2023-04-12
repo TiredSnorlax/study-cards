@@ -5,6 +5,7 @@
 	import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 	import { getAuth } from 'firebase/auth';
 	import { goto } from '$app/navigation';
+	import HomeBtn from '$lib/components/HomeBtn.svelte';
 
 	const auth = getAuth();
 	let user = userStore(auth);
@@ -38,6 +39,7 @@
 </script>
 
 <div class="page">
+	<HomeBtn path={'../../'} />
 	<div class="menu">
 		<h2>Create Deck</h2>
 		<div class="fields title">

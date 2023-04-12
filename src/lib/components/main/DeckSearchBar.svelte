@@ -108,10 +108,17 @@
 
 	.deckSearchBar {
 		width: 100%;
-		border: 2px solid rgba(200, 200, 200, 0.8);
+		border: 2px solid var(--primary-color);
 		border-radius: 3rem;
 		padding: 0.5rem 1rem;
 		font-size: 1.2rem;
+		color: var(--primary-color);
+
+		transition: 0.3s;
+	}
+
+	.deckSearchBar:focus {
+		background: var(--primary-color);
 		color: grey;
 	}
 
@@ -128,8 +135,8 @@
 	.searchResults {
 		position: absolute;
 
-		left: 1rem;
-		right: 1rem;
+		left: 1.5rem;
+		right: 1.5rem;
 		top: 100%;
 		background: var(--primary-color);
 		padding: 1rem;

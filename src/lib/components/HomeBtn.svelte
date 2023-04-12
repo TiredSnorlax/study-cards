@@ -1,13 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-
-	let domain = '';
-	onMount(() => {
-		domain = 'http://' + window.location.host;
-	});
+	export let path: string = './';
 </script>
 
-<a href={domain}>
+<a href={path}>
 	<span class="material-icons-outlined"> home </span>
 </a>
 

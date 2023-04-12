@@ -77,7 +77,7 @@
 	});
 </script>
 
-<HomeBtn />
+<HomeBtn path={'../../'} />
 <main>
 	<section>
 		<h2>Information</h2>
@@ -181,6 +181,10 @@
 		margin-top: 1rem;
 	}
 
+	section > div > *:nth-child(2) {
+		flex-shrink: 0;
+	}
+
 	section span {
 		font-size: 0.9rem;
 		color: grey;
@@ -192,6 +196,8 @@
 		border-radius: 0.5rem;
 		text-align: center;
 		font-size: 1rem;
+		min-width: 0px;
+		flex-shrink: 1 !important;
 	}
 
 	section.color label {
@@ -216,8 +222,14 @@
 
 	@media (max-width: 600px) {
 		main {
+			padding: 1rem;
 			padding-top: 5rem;
 		}
+
+		section {
+			font-size: 1rem;
+		}
+
 		section span {
 			font-size: 0.8rem;
 			color: grey;

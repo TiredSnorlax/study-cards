@@ -17,14 +17,15 @@
 	let searchResults: IDeck[][] | null = null;
 
 	const getDecks = async (user: User | null) => {
+		decks = [];
 		if (!user) return;
 		const q = query(collection(db, 'decks'), where('ownerId', '==', user.uid));
 
 		const querySnapshot = await getDocs(q);
 		querySnapshot.forEach((doc) => {
-			console.log(doc.id, ' => ', doc.data());
 			let data = doc.data() as IDeck;
-			decks = [{ ...data, id: doc.id }];
+			let deck: IDeck = { ...data, id: doc.id };
+			decks = [...decks, deck];
 		});
 	};
 
@@ -54,7 +55,7 @@
 	}
 
 	h1 {
-		margin-top: 1rem;
+		margin-top: 1.5rem;
 		padding-top: 3rem;
 		text-align: center;
 		font-size: 2.5rem;
@@ -141,7 +142,7 @@
 
 	@media (max-width: 600px) {
 		h1 {
-			font-size: 2rem;
+			font-size: 1.5rem;
 		}
 	}
 </style>

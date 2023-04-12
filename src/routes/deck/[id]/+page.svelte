@@ -49,7 +49,7 @@
 </script>
 
 <div class="page">
-	<HomeBtn />
+	<HomeBtn path={'../../'} />
 	<Profile />
 	{#if shareMenuOpen}
 		<ShareMenu deckId={$deckData.id} bind:shareMenuOpen />
