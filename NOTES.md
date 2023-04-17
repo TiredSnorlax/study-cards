@@ -35,4 +35,4 @@ TODO:
 
 TODO: 
   1. Change components background to the css variables [x]
-  2. Add shared with deck sections in main page [ ]
+  2. Add shared with deck sections in main page [x]

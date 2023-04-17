@@ -13,11 +13,14 @@
 
 	let user = userStore(auth);
 	let decks: IDeck[] = [];
+	let sharedDecks: IDeck[] = [];
 
 	let searchResults: IDeck[][] | null = null;
 
 	const getDecks = async (user: User | null) => {
 		decks = [];
+		sharedDecks = [];
+
 		if (!user) return;
 		const q = query(collection(db, 'decks'), where('ownerId', '==', user.uid));
 
@@ -26,6 +29,14 @@
 			let data = doc.data() as IDeck;
 			let deck: IDeck = { ...data, id: doc.id };
 			decks = [...decks, deck];
+		});
+
+		const sharedQ = query(collection(db, 'decks'), where('sharedWith', 'array-contains', user.uid));
+		const sharedQuerySnapshot = await getDocs(sharedQ);
+		sharedQuerySnapshot.forEach((doc) => {
+			let data = doc.data() as IDeck;
+			let deck: IDeck = { ...data, id: doc.id };
+			sharedDecks = [...sharedDecks, deck];
 		});
 	};
 
@@ -36,9 +47,22 @@
 <div class="page">
 	<h1>{quotes[Math.floor(Math.random() * quotes.length)]}</h1>
 	<DeckSearchBar bind:searchResults />
+	<h2>My Decks</h2>
 	<div class="decks">
 		<a href="/deck/new" class="newDeckBtn"><p>New Deck</p></a>
 		{#each decks as deck}
+			<a href="/deck/{deck.id}" class="deck"
+				><div>
+					<div class="img__container" />
+					<p class="deck__title">{deck.title}</p>
+				</div></a
+			>
+		{/each}
+	</div>
+
+	<h2>Shared With Me</h2>
+	<div class="decks">
+		{#each sharedDecks as deck}
 			<a href="/deck/{deck.id}" class="deck"
 				><div>
 					<div class="img__container" />
